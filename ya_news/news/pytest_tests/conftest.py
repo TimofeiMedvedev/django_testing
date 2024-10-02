@@ -6,6 +6,13 @@ from django.conf import settings
 from django.utils import timezone
 
 COMMENT_TEXT = 'Текст комментария'
+NEW_COMMENT_TEXT = 'Обновлённый комментарий'
+
+
+@pytest.fixture
+def new_comment_text():
+    return NEW_COMMENT_TEXT
+
 
 @pytest.fixture
 def comment_text():
@@ -13,12 +20,14 @@ def comment_text():
 
 
 @pytest.fixture
-def author(django_user_model):  
+def author(django_user_model):
     return django_user_model.objects.create(username='Автор')
 
+
 @pytest.fixture
-def reader(django_user_model):  
+def reader(django_user_model):
     return django_user_model.objects.create(username='Читатель')
+
 
 @pytest.fixture
 def author_client(author):
@@ -26,19 +35,22 @@ def author_client(author):
     client.force_login(author)
     return client
 
+
 @pytest.fixture
 def reader_client(reader):
     client = Client()
-    client.force_login(reader) 
+    client.force_login(reader)
     return client
+
 
 @pytest.fixture
 def news():
-    news = News.objects.create(  
+    news = News.objects.create(
         title='Заголовок',
         text='Текст',
     )
     return news
+
 
 @pytest.fixture
 def comment(news, author):
@@ -49,9 +61,11 @@ def comment(news, author):
     )
     return comment
 
+
 @pytest.fixture
 def id_for_args(news):
     return (news.id,)
+
 
 @pytest.fixture
 def all_news():
@@ -67,6 +81,7 @@ def all_news():
     News.objects.bulk_create(all_news)
     return all_news
 
+
 @pytest.fixture
 def comments(news, author):
     now = timezone.now()
@@ -78,13 +93,6 @@ def comments(news, author):
         comments.save()
     return comments
 
-@pytest.fixture
-def form_data():
-    return {
-        'title': 'Новый заголовок',
-        'text': 'Новый текст',
-        'slug': 'new-slug'
-    }
 
 @pytest.fixture
 def form_data():

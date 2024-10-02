@@ -6,6 +6,7 @@ from notes.models import Note
 
 User = get_user_model()
 
+
 class TestContent(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -43,4 +44,3 @@ class TestContent(TestCase):
                 response = self.client.get(url)
                 self.assertIn('form', response.context)
                 self.assertIsInstance(response.context['form'], NoteForm)
-

@@ -9,8 +9,9 @@ from pytils.translit import slugify
 
 User = get_user_model()
 
+
 class TestNoteCreation(TestCase):
-    
+
     @classmethod
     def setUpTestData(cls):
         cls.author = User.objects.create(username='Автор')
@@ -35,8 +36,7 @@ class TestNoteCreation(TestCase):
             author=self.author,
         )
         return self.notes
-        
-    
+
     def test_user_can_create_note(self):
         response = self.author_client.post(self.url, data=self.form_data)
         self.assertRedirects(response, reverse('notes:success'))
@@ -46,7 +46,6 @@ class TestNoteCreation(TestCase):
         self.assertEqual(new_note.text, self.form_data['text'])
         self.assertEqual(new_note.slug, self.form_data['slug'])
         self.assertEqual(new_note.author, self.author)
-
 
     def test_anonymous_user_cant_create_note(self):
         response = self.client.post(self.url, data=self.form_data)

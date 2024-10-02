@@ -60,8 +60,9 @@ def test_author_can_edit_comment(
         author_client,
         comment,
         form_data,
-        id_for_args):
-    form_data['text'] = 'Обновлённый комментарий'
+        id_for_args,
+        new_comment_text):
+    form_data['text'] = new_comment_text
     url = reverse('news:edit', args=(comment.id,))
     response = author_client.post(url, data=form_data)
     assertRedirects(response, reverse(
@@ -73,8 +74,9 @@ def test_user_cant_edit_comment_of_another_user(
         reader_client,
         comment,
         form_data,
-        comment_text):
-    form_data['text'] = 'Обновлённый комментарий'
+        comment_text,
+        new_comment_text):
+    form_data['text'] = new_comment_text
     url = reverse('news:edit', args=(comment.id,))
     response = reader_client.post(url, data=form_data)
     assert response.status_code == HTTPStatus.NOT_FOUND
