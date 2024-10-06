@@ -9,33 +9,33 @@ from news.models import Comment
 
 COMMENT_TEXT = 'Текст комментария'
 NEW_COMMENT_TEXT = 'Обновлённый комментарий'
+FORM_DATA = {'text': COMMENT_TEXT}
 
 
-def test_anonymous_user_cant_create_comment(client, detail_url, form_data):
+def test_anonymous_user_cant_create_comment(client, detail_url):
     object_count_before = Comment.objects.count()
-    client.post(detail_url, data=form_data)
+    client.post(detail_url, data=FORM_DATA)
     assert object_count_before == Comment.objects.count()
 
 
 def test_user_can_create_comment(
         reader_client,
         news,
-        form_data,
         reader,
         detail_url):
     Comment.objects.all().delete
-    response = reader_client.post(detail_url, data=form_data)
+    response = reader_client.post(detail_url, data=FORM_DATA)
     assertRedirects(response, f'{detail_url}#comments')
     assert Comment.objects.count() == 1
     comment = Comment.objects.get()
-    assert comment.text == form_data['text']
+    assert comment.text == FORM_DATA['text']
     assert comment.news == news
     assert comment.author == reader
 
 
 @pytest.mark.parametrize(
     'bad_words_list',
-    (BAD_WORDS)
+    BAD_WORDS
 )
 def test_user_cant_use_bad_words(reader_client, detail_url, bad_words_list):
     bad_words_data = {'text': f'Какой-то текст, {bad_words_list}, еще текст'}
@@ -65,12 +65,11 @@ def test_user_cant_delete_comment_of_another_user(reader_client, delete_url):
 
 def test_author_can_edit_comment(
         author_client,
-        form_data,
         news,
         edit_url,
         comment):
-    form_data['text'] = NEW_COMMENT_TEXT
-    response = author_client.post(edit_url, data=form_data)
+    FORM_DATA['text'] = NEW_COMMENT_TEXT
+    response = author_client.post(edit_url, data=FORM_DATA)
     assertRedirects(response, reverse(
         'news:detail',
         args=(news.id,)) + '#comments')
@@ -82,11 +81,10 @@ def test_user_cant_edit_comment_of_another_user(
         reader_client,
         author,
         comment,
-        form_data,
         edit_url,
         news):
-    form_data['text'] = NEW_COMMENT_TEXT
-    response = reader_client.post(edit_url, data=form_data)
+    FORM_DATA['text'] = NEW_COMMENT_TEXT
+    response = reader_client.post(edit_url, data=FORM_DATA)
     assert response.status_code == HTTPStatus.NOT_FOUND
     comment.refresh_from_db()
     assert comment.text == COMMENT_TEXT
